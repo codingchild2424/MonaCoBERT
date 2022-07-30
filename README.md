@@ -5,7 +5,7 @@ This repository is for the research Monotonic attention based ConvBERT for Knowl
 
 # Setups
 
-1. We used docker environments, **ufoym/deefo**.
+1. We used docker environments, **ufoym/deefo**.  
    [https://hub.docker.com/r/ufoym/deepo/](https://hub.docker.com/r/ufoym/deepo/)
 2. If you don't use docker environments, then you can use **requirements.txt**.
 
