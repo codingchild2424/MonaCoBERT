@@ -4,14 +4,13 @@ This repository is for the research Monotonic attention based ConvBERT for Knowl
 
 # Setups
 
-1. We used docker environments, **ufoym/deefo**.  
-   [https://hub.docker.com/r/ufoym/deepo/](https://hub.docker.com/r/ufoym/deepo/)
+1. We used docker environments, **ufoym/deefo**.[https://hub.docker.com/r/ufoym/deepo/](https://hub.docker.com/r/ufoym/deepo/)
 2. If you don't use docker environments, then you can use **requirements.txt**.
 
    ```
    pip install -r requirements.txt
    ```
-3. You need to make directories for running code. However, some directory was not uploaded because of **.gitignore.** You can refer to Directory section for making directories.
+3. You need to make directories for running code. However, some directory was not uploaded because of **.gitignore.** You can refer to D**irectory toggle** for making directories.
 
    <details><summary>Directory</summary>
 
