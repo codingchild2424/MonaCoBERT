@@ -106,4 +106,6 @@ python train.py --model_fn model.pth --model_name monacobert_ctt --dataset_name 
 
 # Errata
 
+If you have any question or find error in the code, you can send me a mail.
+
 Contact: Unggi Lee ([codingchild@korea.ac.kr](mailto:codingchild@korea.ac.kr)).
