@@ -81,7 +81,6 @@ This repository is for the research Monotonic attention based ConvBERT for Knowl
 
    ```
    python preprocess_data.py --data_name assist09 --min_user_inter_num 5
-
    ```
 
 # How to run this code?
