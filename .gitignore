@@ -1,0 +1,9 @@
+model_records/
+score_records/
+datasets/
+src/test.ipynb
+src/test1.py
+src/nohup.out
+checkpoints/
+graphs/
+visual_records/
