@@ -5,15 +5,21 @@ This repository is for the research Monotonic attention based ConvBERT for Knowl
 
 # Setups
 
-We used docker environments, **ufoym/deefo**.
+1. We used docker environments, **ufoym/deefo**.
+   [https://hub.docker.com/r/ufoym/deepo/](https://hub.docker.com/r/ufoym/deepo/)
+2. If you don't use docker environments, then you can use **requirements.txt**.
 
-[https://hub.docker.com/r/ufoym/deepo/](https://hub.docker.com/r/ufoym/deepo/)
+   ```
+   pip install -r requirements.txt
+   ```
+3. You need to make directories for running code. However, some directory was not uploaded because of **.gitignore.** You can refer to Directory section for making directories.
+4. You can download the preprocessed dataset from our Google Drive.
+   [https://drive.google.com/drive/folders/1B5vHabKUwzGEQAyDaj_0cBT6UqTMA13L?usp=sharing](https://drive.google.com/drive/folders/1B5vHabKUwzGEQAyDaj_0cBT6UqTMA13L?usp=sharing)
+5. If you want to preprocess yourself, you can use **preprocess_data.py**.
 
-If you don't use docker environments, then you can use **requirements.txt**.
-
-```
-pip install -r requirements.txt
-```
+   ```
+   python preprocess_data.py --data_name assist09 --min_user_inter_num 5
+   ```
 
 
 # Directory
@@ -65,6 +71,7 @@ pip install -r requirements.txt
     │   ├── ednet_pid_diff_loader.py
     │   └── ednet_pid_loader.py
     ├── define_argparser.py
+    ├── preprocess_data.py
     ├── get_modules
     │   ├── get_loaders.py
     │   ├── get_models.py
