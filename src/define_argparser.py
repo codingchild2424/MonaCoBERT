@@ -30,11 +30,7 @@ def define_argparser():
     p.add_argument('--output_size', type=int, default=1) # KT is binary classification
     p.add_argument('--dropout_p', type=int, default=.1)
     p.add_argument('--use_leakyrelu', type=bool, default=True)
-
-    # bigberd4kt's arguments
-    p.add_argument('--num_random_blocks', type=int, default=3) # num_random_blocks = 3 
-    p.add_argument('--block_size', type=int, default=5) # block_size = 64
-
+    
     # grad_accumulation
     p.add_argument('--grad_acc', type=bool, default=False)
     p.add_argument('--grad_acc_iter', type=int, default=2)

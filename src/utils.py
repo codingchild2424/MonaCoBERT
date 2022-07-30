@@ -12,6 +12,7 @@ from torch.nn.functional import binary_cross_entropy
 
 import matplotlib.pyplot as plt
 
+# collate_fn
 def collate_fn(batch, pad_val=-1):
 
     q_seqs = []
@@ -38,6 +39,7 @@ def collate_fn(batch, pad_val=-1):
     #|r_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
     #|mask_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
 
+# for pid
 def pid_collate_fn(batch, pad_val=-1):
 
     q_seqs = []
@@ -65,47 +67,12 @@ def pid_collate_fn(batch, pad_val=-1):
     q_seqs, r_seqs, pid_seqs = q_seqs * mask_seqs, r_seqs * mask_seqs, pid_seqs * mask_seqs
 
     return q_seqs, r_seqs, pid_seqs, mask_seqs
-    #|q_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|r_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|mask_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
+    #|q_seqs| = (batch_size, max_seq_len)
+    #|r_seqs| = (batch_size, max_seq_len)
+    #|pid_seqs| = (batch_size, max_seq_len)
+    #|mask_seqs| = (batch_size, max_seq_len)
 
-
-def pid_time_collate_fn(batch, pad_val=-1):
-
-    q_seqs = []
-    r_seqs = []
-    pid_seqs = []
-    time_seqs = []
-
-    for q_seq, r_seq, pid_seq, time_seq in batch:
-
-        q_seqs.append(torch.Tensor(q_seq))
-        r_seqs.append(torch.Tensor(r_seq))
-        pid_seqs.append(torch.Tensor(pid_seq))
-        time_seqs.append(torch.Tensor(time_seq))
-
-    q_seqs = pad_sequence(
-        q_seqs, batch_first=True, padding_value=pad_val
-    )
-    r_seqs = pad_sequence(
-        r_seqs, batch_first=True, padding_value=pad_val
-    )
-    pid_seqs = pad_sequence(
-        pid_seqs, batch_first=True, padding_value=pad_val
-    )
-    time_seqs = pad_sequence(
-        time_seqs, batch_first=True, padding_value=pad_val
-    )
-
-    mask_seqs = (q_seqs != pad_val)
-
-    q_seqs, r_seqs, pid_seqs, time_seqs = q_seqs * mask_seqs, r_seqs * mask_seqs, pid_seqs * mask_seqs, time_seqs * mask_seqs
-
-    return q_seqs, r_seqs, pid_seqs, time_seqs, mask_seqs
-    #|q_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|r_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|mask_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-
+# for pid_diff
 def pid_diff_collate_fn(batch, pad_val=-1):
 
     q_seqs = []
@@ -138,50 +105,11 @@ def pid_diff_collate_fn(batch, pad_val=-1):
     q_seqs, r_seqs, pid_seqs, diff_seqs = q_seqs * mask_seqs, r_seqs * mask_seqs, pid_seqs * mask_seqs, diff_seqs * mask_seqs
 
     return q_seqs, r_seqs, pid_seqs, diff_seqs, mask_seqs
-    #|q_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|r_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|mask_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-
-def pid_diff_pt_collate_fn(batch, pad_val=-1):
-
-    q_seqs = []
-    r_seqs = []
-    pid_seqs = []
-    diff_seqs = []
-    pt_seqs = []
-
-    for q_seq, r_seq, pid_seq, diff_seq, pt_seq in batch:
-
-        q_seqs.append(torch.Tensor(q_seq))
-        r_seqs.append(torch.Tensor(r_seq))
-        pid_seqs.append(torch.Tensor(pid_seq))
-        diff_seqs.append(torch.Tensor(diff_seq))
-        pt_seqs.append(torch.Tensor(pt_seq))
-
-    q_seqs = pad_sequence(
-        q_seqs, batch_first=True, padding_value=pad_val
-    )
-    r_seqs = pad_sequence(
-        r_seqs, batch_first=True, padding_value=pad_val
-    )
-    pid_seqs = pad_sequence(
-        pid_seqs, batch_first=True, padding_value=pad_val
-    )
-    diff_seqs = pad_sequence(
-        diff_seqs, batch_first=True, padding_value=pad_val
-    )
-    pt_seqs = pad_sequence(
-        pt_seqs, batch_first=True, padding_value=pad_val
-    )
-
-    mask_seqs = (q_seqs != pad_val)
-
-    q_seqs, r_seqs, pid_seqs, diff_seqs, pt_seqs = q_seqs * mask_seqs, r_seqs * mask_seqs, pid_seqs * mask_seqs, diff_seqs * mask_seqs, pt_seqs * mask_seqs
-
-    return q_seqs, r_seqs, pid_seqs, diff_seqs, pt_seqs, mask_seqs
-    #|q_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|r_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
-    #|mask_seqs| = (batch_size, maximum_sequence_length_in_the_batch)
+    #|q_seqs| = (batch_size, max_seq_len)
+    #|r_seqs| = (batch_size, max_seq_len)
+    #|pid_seqs| = (batch_size, max_seq_len)
+    #|diff_seqs| = (batch_size, max_seq_len)
+    #|mask_seqs| = (batch_size, max_seq_len)
 
 # get_optimizer
 def get_optimizers(model, config):
