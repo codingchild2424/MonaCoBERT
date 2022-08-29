@@ -1,6 +1,17 @@
 # MonaCoBERT: Monotonic attention based ConvBERT for Knowledge Tracing
 
-This repository is for the research Monotonic attention based ConvBERT for Knowledge Tracing (MonaCoBERT).
+This repository is for the research Monotonic attention based ConvBERT for Knowledge Tracing (https://arxiv.org/abs/2208.12615).
+
+If you find this code useful in your research, please cite
+```
+@misc{2208.12615,
+Author = {Unggi Lee and Yonghyun Park and Yujin Kim and Seongyune Choi and Hyeoncheol Kim},
+Title = {MonaCoBERT: Monotonic attention based ConvBERT for Knowledge Tracing},
+Year = {2022},
+Eprint = {arXiv:2208.12615},
+}
+```
+
 
 # Setups
 
