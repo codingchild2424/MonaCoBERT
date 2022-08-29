@@ -25,7 +25,8 @@ def main(config, train_loader=None, valid_loader=None, test_loader=None, num_q=N
         num_diff = num_diff
     # 1-2. not use fivefold
     else:
-        train_loader, valid_loader, test_loader, num_q, num_r, num_pid, num_diff = get_loaders(config)
+        idx = 0
+        train_loader, valid_loader, test_loader, num_q, num_r, num_pid, num_diff = get_loaders(config, idx)
 
     # 2. select models using get_models
     model = get_models(num_q, num_r, num_pid, num_diff, device, config)

@@ -6,10 +6,15 @@ from torch.utils.data import Dataset
 DATASET_DIR = "../datasets/assistments09/preprocessed_df.csv"
 
 class ASSIST2009_PID_DIFF(Dataset):
-    def __init__(self, max_seq_len, dataset_dir=DATASET_DIR) -> None:
+    def __init__(self, max_seq_len, idx=None, config=None, dataset_dir=DATASET_DIR) -> None:
         super().__init__()
 
         self.dataset_dir = dataset_dir
+
+        self.idx = idx
+
+        # 추가
+        self.config = config
         
         self.q_seqs, self.r_seqs, self.q_list, self.u_list, \
             self.r_list, self.q2idx, self.u2idx, self.pid_seqs, \
@@ -46,26 +51,102 @@ class ASSIST2009_PID_DIFF(Dataset):
         pid2idx = {pid: idx for idx, pid in enumerate(pid_list)} 
 
         # difficult
-        diff = np.round(df.groupby('item_id')['correct'].mean() * 100)
-        diff_list = np.unique(df.groupby('item_id')['correct'].mean())
+        # diff = np.round(df.groupby('item_id')['correct'].mean() * 100)
+        # diff_list = np.unique(df.groupby('item_id')['correct'].mean())
+
+        u_idx = np.arange(int(len(u_list)))
+
+        # idx에 맞게 조정
+        first_chunk = u_idx[ : int(len(u_list) * 0.2) ]
+        second_chunk = u_idx[ int(len(u_list) * 0.2) : int(len(u_list) * 0.4) ]
+        third_chunk = u_idx[ int(len(u_list) * 0.4) : int(len(u_list) * 0.6) ]
+        fourth_chunk = u_idx[ int(len(u_list) * 0.6) : int(len(u_list) * 0.8) ]
+        fifth_chunk = u_idx[ int(len(u_list) * 0.8) : ]
+
+        if self.idx == 0:
+            train_u_idx = np.concatenate( (second_chunk, third_chunk, fourth_chunk, fifth_chunk), axis = 0 )
+            real_train_u_idx = train_u_idx[ : int( len(train_u_idx) * (1 - self.config.valid_ratio) ) ]
+            valid_u_idx = train_u_idx[ int( len(train_u_idx) * (1 - self.config.valid_ratio) ) : ]
+            test_u_idx = first_chunk
+        elif self.idx == 1:
+            train_u_idx = np.concatenate( (first_chunk, third_chunk, fourth_chunk, fifth_chunk), axis = 0 )
+            real_train_u_idx = train_u_idx[ : int( len(train_u_idx) * (1 - self.config.valid_ratio) ) ]
+            valid_u_idx = train_u_idx[ int( len(train_u_idx) * (1 - self.config.valid_ratio) ) : ]
+            test_u_idx = second_chunk
+        elif self.idx == 2:
+            train_u_idx = np.concatenate( (first_chunk, second_chunk, fourth_chunk, fifth_chunk), axis = 0 )
+            real_train_u_idx = train_u_idx[ : int( len(train_u_idx) * (1 - self.config.valid_ratio) ) ]
+            valid_u_idx = train_u_idx[ int( len(train_u_idx) * (1 - self.config.valid_ratio) ) : ]
+            test_u_idx = third_chunk
+        elif self.idx == 3:
+            train_u_idx = np.concatenate( (first_chunk, second_chunk, third_chunk, fifth_chunk), axis = 0 )
+            real_train_u_idx = train_u_idx[ : int( len(train_u_idx) * (1 - self.config.valid_ratio) ) ]
+            valid_u_idx = train_u_idx[ int( len(train_u_idx) * (1 - self.config.valid_ratio) ) : ]
+            test_u_idx = fourth_chunk
+        elif self.idx == 4:
+            train_u_idx = np.concatenate( (first_chunk, second_chunk, third_chunk, fourth_chunk), axis = 0 )
+            real_train_u_idx = train_u_idx[ : int( len(train_u_idx) * (1 - self.config.valid_ratio) ) ]
+            valid_u_idx = train_u_idx[ int( len(train_u_idx) * (1 - self.config.valid_ratio) ) : ]
+            test_u_idx = fifth_chunk
+
+        # train_u_idx = u_idx[ : int(len(u_list) * self.config.train_ratio) ]
+        # test_u_idx = u_idx[ int(len(u_list) * self.config.train_ratio) : ]
+
+        # real_train_u_idx = train_u_idx[ : int(len(train_u_idx) * ( 1 - self.config.valid_ratio))]
+        # valid_u_idx = train_u_idx[ int(len(train_u_idx) * ( 1 - self.config.valid_ratio)) : ]
 
         q_seqs = []
         r_seqs = []
         pid_seqs = []
-        diff_seqs = []
+        #diff_seqs = []
 
-        for u in u_list:
+        # for diff
+        train_pid_seqs = []
+        train_r_seqs = []
+
+        for idx, u in enumerate(u_list):
             df_u = df[df["user_id"] == u]
 
             q_seq = np.array([q2idx[q] for q in df_u["skill_id"].values])
             r_seq = df_u["correct"].values
             pid_seq = np.array([pid2idx[pid] for pid in df_u["item_id"].values])
-            diff_seq = np.array([diff[item] for item in df_u["item_id"].values])
+            #diff_seq = np.array([diff[item] for item in df_u["item_id"].values])
 
             q_seqs.append(q_seq)
             r_seqs.append(r_seq)
             pid_seqs.append(pid_seq)
-            diff_seqs.append(diff_seq)
+            #diff_seqs.append(diff_seq)
+
+            if idx in real_train_u_idx:
+                train_pid_seqs.extend(pid_seq)
+                train_r_seqs.extend(r_seq)
+
+        # train_df
+        train_df = pd.DataFrame(
+            zip(train_pid_seqs, train_r_seqs), 
+            columns = ["pid", "r"]
+            )
+        # pid_diff
+        train_pid_diff = np.round(train_df.groupby('pid')['r'].mean() * 100)
+        diff_list = np.unique(train_df.groupby('pid')['r'].mean()) 
+        # <class 'pandas.core.series.Series'>
+
+        diff_seqs = []
+
+        train_pid_list = np.unique(train_pid_seqs)
+
+        for pid_seq in pid_seqs:
+
+            pid_diff_seq = []
+
+            for pid in pid_seq:
+                if pid not in train_pid_list:
+                    pid_diff_seq.append(float(75)) # <PAD>
+                else:
+                    pid_diff_seq.append(train_pid_diff[pid])
+
+            diff_seqs.append(pid_diff_seq)    
+        
 
         return q_seqs, r_seqs, q_list, u_list, r_list, q2idx, u2idx, pid_seqs, diff_seqs, pid_list, diff_list #끝에 두개 추가
 

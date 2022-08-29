@@ -119,42 +119,42 @@ def get_loaders(config, idx=None):
 
     # diff loader
     elif config.dataset_name == "assist2009_pid_diff":
-        dataset = ASSIST2009_PID_DIFF(config.max_seq_len)
+        dataset = ASSIST2009_PID_DIFF(config.max_seq_len, idx=idx, config=config)
         num_q = dataset.num_q
         num_r = dataset.num_r
         num_pid = dataset.num_pid
         num_diff = dataset.num_diff
         collate = pid_diff_collate_fn
     elif config.dataset_name == "assist2012_pid_diff":
-        dataset = ASSIST2012_PID_DIFF(config.max_seq_len)
+        dataset = ASSIST2012_PID_DIFF(config.max_seq_len, idx=idx, config=config)
         num_q = dataset.num_q
         num_r = dataset.num_r
         num_pid = dataset.num_pid
         num_diff = dataset.num_diff
         collate = pid_diff_collate_fn
     elif config.dataset_name == "assist2017_pid_diff":
-        dataset = ASSIST2017_PID_DIFF(config.max_seq_len)
+        dataset = ASSIST2017_PID_DIFF(config.max_seq_len, idx=idx, config=config)
         num_q = dataset.num_q
         num_r = dataset.num_r
         num_pid = dataset.num_pid
         num_diff = dataset.num_diff
         collate = pid_diff_collate_fn
     elif config.dataset_name == "algebra2005_pid_diff":
-        dataset = ALGEBRA2005_PID_DIFF(config.max_seq_len)
+        dataset = ALGEBRA2005_PID_DIFF(config.max_seq_len, idx=idx, config=config)
         num_q = dataset.num_q
         num_r = dataset.num_r
         num_pid = dataset.num_pid
         num_diff = dataset.num_diff
         collate = pid_diff_collate_fn
     elif config.dataset_name == "algebra2006_pid_diff":
-        dataset = ALGEBRA2006_PID_DIFF(config.max_seq_len)
+        dataset = ALGEBRA2006_PID_DIFF(config.max_seq_len, idx=idx, config=config)
         num_q = dataset.num_q
         num_r = dataset.num_r
         num_pid = dataset.num_pid
         num_diff = dataset.num_diff
         collate = pid_diff_collate_fn
     elif config.dataset_name == "ednet_pid_diff":
-        dataset = EDNET_PID_DIFF(config.max_seq_len)
+        dataset = EDNET_PID_DIFF(config.max_seq_len, idx=idx, config=config)
         num_q = dataset.num_q
         num_r = dataset.num_r
         num_pid = dataset.num_pid
@@ -178,66 +178,83 @@ def get_loaders(config, idx=None):
         # fivefold first
         if idx == 0:
             # train_dataset is 0.8 of whole dataset
-            train_dataset = ConcatDataset([second_chunk, third_chunk, fourth_chunk, fifth_chunk])
-            # valid_size is 0.1 of train_dataset
-            valid_size = int( len(train_dataset) * config.valid_ratio)
-            # train_size is 0.9 of train_dataset
-            train_size = int( len(train_dataset) ) - valid_size
-            
-            train_dataset, valid_dataset = random_split(
-                train_dataset, [ train_size, valid_size ]
-            )
-            # test_dataset is 0.2 of whole dataset
+            dummy_train_dataset = ConcatDataset([second_chunk, third_chunk, fourth_chunk, fifth_chunk])
+
+            train_size = int( len(dataset) * config.train_ratio * (1 - config.valid_ratio))
+            valid_size = int( len(dataset) * config.train_ratio * config.valid_ratio)
+            test_size = len(dataset) - (train_size + valid_size)
+
+            # 여기서 loader 그대로 쪼개기
+            train_dataset = Subset(dummy_train_dataset, range( train_size ))
+            valid_dataset = Subset(dummy_train_dataset, range( train_size, train_size + valid_size ))
+
             test_dataset = first_chunk
         # fivefold second
         elif idx == 1:
-            train_dataset = ConcatDataset([first_chunk, third_chunk, fourth_chunk, fifth_chunk])
-            valid_size = int( len(train_dataset) * config.valid_ratio) #train의 0.1
-            train_size = int( len(train_dataset) ) - valid_size #train의 0.9
-            
-            train_dataset, valid_dataset = random_split(
-                train_dataset, [ train_size, valid_size ]
-            )
+            dummy_train_dataset = ConcatDataset([first_chunk, third_chunk, fourth_chunk, fifth_chunk])
+
+            train_size = int( len(dataset) * config.train_ratio * (1 - config.valid_ratio))
+            valid_size = int( len(dataset) * config.train_ratio * config.valid_ratio)
+            test_size = len(dataset) - (train_size + valid_size)
+
+            # 여기서 loader 그대로 쪼개기
+            train_dataset = Subset(dummy_train_dataset, range( train_size ))
+            valid_dataset = Subset(dummy_train_dataset, range( train_size, train_size + valid_size ))
+
             test_dataset = second_chunk
         # fivefold third
         elif idx == 2:
-            train_dataset = ConcatDataset([first_chunk, second_chunk, fourth_chunk, fifth_chunk])
-            valid_size = int( len(train_dataset) * config.valid_ratio) #train의 0.1
-            train_size = int( len(train_dataset) ) - valid_size #train의 0.9
-            
-            train_dataset, valid_dataset = random_split(
-                train_dataset, [ train_size, valid_size ]
-            )
+            dummy_train_dataset = ConcatDataset([first_chunk, second_chunk, fourth_chunk, fifth_chunk])
+
+            train_size = int( len(dataset) * config.train_ratio * (1 - config.valid_ratio))
+            valid_size = int( len(dataset) * config.train_ratio * config.valid_ratio)
+            test_size = len(dataset) - (train_size + valid_size)
+
+            # 여기서 loader 그대로 쪼개기
+            train_dataset = Subset(dummy_train_dataset, range( train_size ))
+            valid_dataset = Subset(dummy_train_dataset, range( train_size, train_size + valid_size ))
+
             test_dataset = third_chunk
         # fivefold fourth
         elif idx == 3:
-            train_dataset = ConcatDataset([first_chunk, second_chunk, third_chunk, fifth_chunk])
-            valid_size = int( len(train_dataset) * config.valid_ratio) #train의 0.1
-            train_size = int( len(train_dataset) ) - valid_size #train의 0.9
-            
-            train_dataset, valid_dataset = random_split(
-                train_dataset, [ train_size, valid_size ]
-            )
+            dummy_train_dataset = ConcatDataset([first_chunk, second_chunk, third_chunk, fifth_chunk])
+
+            train_size = int( len(dataset) * config.train_ratio * (1 - config.valid_ratio))
+            valid_size = int( len(dataset) * config.train_ratio * config.valid_ratio)
+            test_size = len(dataset) - (train_size + valid_size)
+
+            # 여기서 loader 그대로 쪼개기
+            train_dataset = Subset(dummy_train_dataset, range( train_size ))
+            valid_dataset = Subset(dummy_train_dataset, range( train_size, train_size + valid_size ))
+
             test_dataset = fourth_chunk
         # fivefold fifth
         elif idx == 4:
-            train_dataset = ConcatDataset([first_chunk, second_chunk, third_chunk, fourth_chunk])
-            valid_size = int( len(train_dataset) * config.valid_ratio) #train의 0.1
-            train_size = int( len(train_dataset) ) - valid_size #train의 0.9
-            
-            train_dataset, valid_dataset = random_split(
-                train_dataset, [ train_size, valid_size ]
-            )
+            dummy_train_dataset = ConcatDataset([first_chunk, second_chunk, third_chunk, fourth_chunk])
+
+            train_size = int( len(dataset) * config.train_ratio * (1 - config.valid_ratio))
+            valid_size = int( len(dataset) * config.train_ratio * config.valid_ratio)
+            test_size = len(dataset) - (train_size + valid_size)
+
+            # 여기서 loader 그대로 쪼개기
+            train_dataset = Subset(dummy_train_dataset, range( train_size ))
+            valid_dataset = Subset(dummy_train_dataset, range( train_size, train_size + valid_size ))
+
             test_dataset = fifth_chunk
     # fivefold = False
     else:
+
         train_size = int( len(dataset) * config.train_ratio * (1 - config.valid_ratio))
         valid_size = int( len(dataset) * config.train_ratio * config.valid_ratio)
         test_size = len(dataset) - (train_size + valid_size)
 
-        train_dataset, valid_dataset, test_dataset = random_split(
-            dataset, [ train_size, valid_size, test_size ]
-            )
+        train_dataset = Subset(dataset, range( train_size ))
+        valid_dataset = Subset(dataset, range( train_size, train_size + valid_size ))
+        test_dataset = Subset(dataset, range( train_size + valid_size, train_size + valid_size + test_size ))
+
+        # train_dataset, valid_dataset, test_dataset = random_split(
+        #     dataset, [ train_size, valid_size, test_size ]
+        #     )
 
     # 3. get DataLoader
     train_loader = DataLoader(
