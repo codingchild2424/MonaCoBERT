@@ -9,6 +9,8 @@ from random import random, randint
 
 from utils import EarlyStopping
 
+from sklearn.metrics import mean_squared_error
+
 # For Train MLM
 # 15% <MASK>, 80% of 15% are real <MASK>, 10% of 15% are reverse, 10% of 15% are not changed
 def Mlm4BertTrain(r_seqs, mask_seqs):
@@ -186,13 +188,15 @@ class MonaCoBERT_CTT_Trainer():
         y_scores = torch.cat(y_scores).detach().cpu().numpy()
 
         auc_score += metrics.roc_auc_score( y_trues, y_scores )
+        rmse_score = np.sqrt(mean_squared_error(y_true=y_trues, y_pred=y_scores))
+        
 
-        loss_result = torch.mean(torch.Tensor(loss_list)).detach().cpu().numpy()
+        #loss_result = torch.mean(torch.Tensor(loss_list)).detach().cpu().numpy()
 
         if metric_name == "AUC":
             return auc_score
         elif metric_name == "RMSE":
-            return loss_result
+            return rmse_score
 
     def _validate(self, valid_loader, metric_name):
 
@@ -242,12 +246,14 @@ class MonaCoBERT_CTT_Trainer():
 
         auc_score += metrics.roc_auc_score( y_trues, y_scores )
 
-        loss_result = torch.mean(torch.Tensor(loss_list)).detach().cpu().numpy()
+        rmse_score = np.sqrt(mean_squared_error(y_true=y_trues, y_pred=y_scores))
+
+        #loss_result = torch.mean(torch.Tensor(loss_list)).detach().cpu().numpy()
 
         if metric_name == "AUC":
             return auc_score
         elif metric_name == "RMSE":
-            return loss_result
+            return rmse_score
 
     def _test(self, test_loader, metric_name):
 
@@ -297,12 +303,13 @@ class MonaCoBERT_CTT_Trainer():
 
         auc_score += metrics.roc_auc_score( y_trues, y_scores )
 
-        loss_result = torch.mean(torch.Tensor(loss_list)).detach().cpu().numpy()
+        rmse_score = np.sqrt(mean_squared_error(y_true=y_trues, y_pred=y_scores))
+        #loss_result = torch.mean(torch.Tensor(loss_list)).detach().cpu().numpy()
 
         if metric_name == "AUC":
             return auc_score
         elif metric_name == "RMSE":
-            return loss_result
+            return rmse_score
 
     # train use the _train, _validate, _test
     def train(self, train_loader, valid_loader, test_loader, config):
