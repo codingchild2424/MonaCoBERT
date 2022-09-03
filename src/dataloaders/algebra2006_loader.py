@@ -96,8 +96,8 @@ class ALGEBRA2006(Dataset):
 
             i = 0
             while i + max_seq_len + 1 < len(q_seq):
-                proc_q_seqs.append(q_seq[i:i + max_seq_len + 1])
-                proc_r_seqs.append(r_seq[i:i + max_seq_len + 1])
+                proc_q_seqs.append(q_seq[i:i + max_seq_len])
+                proc_r_seqs.append(r_seq[i:i + max_seq_len])
 
                 i += max_seq_len + 1
 
