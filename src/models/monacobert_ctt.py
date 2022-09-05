@@ -4,6 +4,12 @@ import numpy as np
 import math
 import torch.nn.functional as F
 
+class HookHelper(nn.Module):
+    '''custom Module wrapper for register_forward_hook
+    '''
+    def forward(self, x):
+        return x
+
 # SeparableConv1D
 class SeparableConv1D(nn.Module):
     def __init__(self, input_filters, output_filters, kernel_size):
@@ -76,8 +82,14 @@ class MonotonicConvolutionalMultiheadAttention(nn.Module):
         
         # this is for the distance function
         self.gammas = nn.Parameter(torch.zeros(self.num_attention_heads, 1, 1))
-
         self.dropout = nn.Dropout(dropout_p)
+
+        self.filters = None
+        self.attn_scores = None
+        self.conv_value_vectors = None
+
+        self.conv_hook_helper = HookHelper()
+        self.attn_hook_helper = HookHelper()
 
     def forward(self, Q, K, V, mask=None):
         # |Q| = |K| = |V| = (bs, n, hs)
@@ -117,6 +129,9 @@ class MonotonicConvolutionalMultiheadAttention(nn.Module):
         conv_kernel_layer = torch.softmax(conv_kernel_layer, dim=1)
         # |conv_kernel_layer| = (51200, 9, 1), 각 head별 확률값들을 도출하는 듯
 
+        # save the filter pattern
+        self.filters = conv_kernel_layer.detach().clone()
+
         # q X k is matmul with v
         conv_out_layer = self.conv_out_layer(V)
         # |conv_out_layer| = (bs, n, hs/2(all_attn_h_size))
@@ -124,6 +139,9 @@ class MonotonicConvolutionalMultiheadAttention(nn.Module):
         # |conv_out_layer| = (bs, n, hs/2(all_attn_h_size))
         conv_out_layer = conv_out_layer.transpose(1, 2).contiguous().unsqueeze(-1)
         # |conv_out_layer| = (bs, hs/2(all_attn_h_size), n, 1)
+
+        self.conv_value_vectors = conv_out_layer.detach().clone()
+
         # unfold 참고 -> #https://www.facebook.com/groups/PyTorchKR/posts/1685133764959631/
         conv_out_layer = nn.functional.unfold( 
             conv_out_layer,
@@ -144,6 +162,8 @@ class MonotonicConvolutionalMultiheadAttention(nn.Module):
         # |conv_out_layer|, default = (51200, 32, 1)
         conv_out_layer = torch.reshape(conv_out_layer, [-1, self.all_head_size])
         # |conv_out_layer|, default = (6400, 256)
+        conv_out = torch.reshape(conv_out_layer, [batch_size, -1, self.num_attention_heads, self.attention_head_size])
+        # |conv_out| = (bs, n, n_attn_head, attn_head_size) = (64, 100, 8, 32)
 
         ###################
         # self_attn layer #
@@ -181,16 +201,23 @@ class MonotonicConvolutionalMultiheadAttention(nn.Module):
         attention_probs = self.dropout(attention_probs)
         # |attention_probs| = (bs, n_attn_head, n, n) = (64, 8, 100, 100)
 
+        # save the attention scores
+        self.attn_scores = attention_probs.detach().clone()
+
         context_layer = torch.matmul(attention_probs, value_layer)
         # |context_layer| = (bs, n_attn_head, n, attn_head_size) = (64, 8, 100, 32)
         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
         # |context_layer| = (bs, n, n_attn_head, attn_head_size) = (64, 100, 8, 32)
+
+        ###############
+        # hook helper #
+        ###############
+        context_layer = self.attn_hook_helper(context_layer)
+        conv_out = self.conv_hook_helper(conv_out)
         
         #########################################
         # concat with conv and self_attn values #
         #########################################
-        conv_out = torch.reshape(conv_out_layer, [batch_size, -1, self.num_attention_heads, self.attention_head_size])
-        # |conv_out| = (bs, n, n_attn_head, attn_head_size) = (64, 100, 8, 32)
         context_layer = torch.cat([context_layer, conv_out], 2)
         # |context_layer| = (bs, n, n_attn_head * 2, attn_head_size) = (64, 100, 16, 32)
         new_context_layer_shape = context_layer.size()[:-2] + \

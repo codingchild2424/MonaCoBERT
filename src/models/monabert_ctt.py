@@ -142,6 +142,9 @@ class MonotonicMultiheadAttention(nn.Module):
         attention_probs = self.dropout(attention_probs)
         # |attention_probs| = (bs, n_attn_head, n, n) = (64, 8, 100, 100)
 
+        # save the attention scores
+        self.attn_scores = attention_probs.detach().clone()
+
         context_layer = torch.matmul(attention_probs, value_layer)
         # |context_layer| = (bs, n_attn_head, n, attn_head_size) = (64, 8, 100, 32)
         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
