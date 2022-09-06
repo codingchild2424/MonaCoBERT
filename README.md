@@ -13,6 +13,27 @@ If you find this code useful in your research, please cite
 }
 ```
 
+# Performance (changed)
+
+Dataset & Metrics | DKT | DKVMN | SAKT | AKT | CL4KT | MCB-NC | MCB -C
+ ---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
+assist09(AUC) | 0.7285 | 0.7271 | 0.7179 | 0.7449 | 0.7600 | 0.8002 | 0.8059
+assist09(RMSE) | 0.4328 | 0.4348 | 0.4381 | 0.4413 | 0.4337 | 0.4029 | 0.4063
+---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
+assist12(AUC) |
+RMSE
+---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
+assist17(AUC) |
+RMSE |
+---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
+algebra05(AUC) |
+RMSE |
+---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
+algebra06(AUC) |
+RMSE |
+---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
+EdNet(AUC) |
+EdNet(RMSE) |
 
 # Setups
 
