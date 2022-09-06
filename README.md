@@ -15,7 +15,7 @@ If you find this code useful in your research, please cite
 
 # Performance (changed)
 
-- Batch size: Batch size was 512.
+- Batch size: Batch size was 512. You can use grad accumulation option, if you don't have enough GPU resources.
 - Early stop: Early stop was 10.
 - Training, validation, test ratio: Training ratio was 80%, test ratio was 20%, valid ratio was 10% of training ratio.
 - Learning rate and optimizer: The learning rate was 0.001. Adam was used.
