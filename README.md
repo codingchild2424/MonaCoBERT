@@ -15,6 +15,12 @@ If you find this code useful in your research, please cite
 
 # Performance (changed)
 
+- Batch size: Batch size was 512.
+- Early stop: Early stop was 10.
+- Training, validation, test ratio: Training ratio was 80%, test ratio was 20%, valid ratio was 10% of training ratio.
+- Learning rate and optimizer: The learning rate was 0.001. Adam was used.
+
+
 |Dataset | Metrics | DKT | DKVMN | SAKT | AKT | CL4KT | MCB-NC | MCB -C
 | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ----
 |assist09 | AUC | 0.7285 | 0.7271 | 0.7179 | 0.7449 | 0.7600 | 0.8002 | 0.8059
