@@ -1,7 +1,6 @@
 # MonaCoBERT: Monotonic attention based ConvBERT for Knowledge Tracing
 
 This repository is for the research Monotonic attention based ConvBERT for Knowledge Tracing (https://arxiv.org/abs/2208.12615).  
-(We changed the paper, and edited performance, it will be updated.)
 
 If you find this code useful in your research, please cite
 ```
